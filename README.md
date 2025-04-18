@@ -65,6 +65,7 @@ Screenshots
 
 
 
+![Screenshot 2025-04-18 010254](https://github.com/user-attachments/assets/a1695a57-c48a-436d-9592-ebf751051d2f)
 
 
 Future Improvements
@@ -80,12 +81,11 @@ RESTful API integration
 
 License
 
-This project is licensed under the MIT License.
+This project is licensed under the [MIT License](https://github.com/shehablotfallah/ToDosApp?tab=MIT-1-ov-file).
 
 
 ---
 
 Author
 
-Developed by Shehab Lotfallah
-GitHub:<github.com/shehablotfallah>
+Developed by [Shehab Lotfallah](https://github.com/shehablotfallah)
