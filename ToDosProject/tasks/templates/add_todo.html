@@ -1,0 +1,67 @@
+{% extends 'base.html' %} 
+
+{% block title %}Add Task{% endblock title %}
+
+{% block styles %}
+    {{ block.super }}
+{% endblock styles %}
+
+{% block content %}
+<section class="vh-100 gradient-custom-2">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-md-10 col-xl-8">
+                <div class="card mask-custom">
+                    <div class="card-body text-white">
+                        <h2 class="text-center mb-4">Add New Task</h2>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                {{ form.title.label_tag }}
+                                {{ form.title }}
+                                {% for error in form.title.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form.description.label_tag }}
+                                {{ form.description }}
+                                {% for error in form.description.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form.due_date.label_tag }}
+                                {{ form.due_date }}
+                                {% for error in form.due_date.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="mb-4 form-check">
+                                {{ form.is_completed }}
+                                {{ form.is_completed.label_tag }}
+                                {% for error in form.is_completed.errors %}
+                                    <div class="text-danger">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="text-center">
+                                <div class="align-items-center">
+                                    <a class="btn btn-secondary me-3 px-4" onclick="window.location.href='{% url 'all_todos' %}'">Cancel</a>
+                                    <button type="submit" class="btn btn-light px-5">Add Task</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% block scripts %}
+    {{ block.super }}
+{% endblock scripts %}

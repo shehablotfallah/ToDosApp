@@ -1,0 +1,17 @@
+{% extends 'base.html'%}
+{% load static %}
+{% block title %}ToDo List{% endblock title %}
+{% block styles %}
+
+{% endblock styles %}
+{% block content %}
+<div class="container text-center py-5 mt-5 justify-content-center vh-100">
+    <h1 class="display-5 mb-4">Welcome to the Todo App!</h1>
+    <p class="lead">Easily manage your tasks, stay organized, and boost your productivity.</p>
+    <a href="{% url 'all_todos' %}" class="btn btn-primary btn-lg mt-3">Get Started</a>
+  </div>
+
+{% block scripts %}
+
+{% endblock scripts %}
+{% endblock content %}

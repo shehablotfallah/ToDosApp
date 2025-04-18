@@ -1,0 +1,221 @@
+{% extends 'base.html'%}
+{% block title %}ToDo List{% endblock title %}
+{% block styles %}
+    {{ block.super }}
+
+<!-- DataTables -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<style>
+.dataTables_wrapper .dataTables_filter {
+  float: none;
+  text-align: center !important;
+}
+</style>
+{% endblock styles %}
+{% block content %}
+<section class="vh-100 gradient-custom-2">
+    <div class="container py-4 h-100">
+      <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-md-12 col-xl-10">
+          <div class="card mask-custom">
+            <div class="card-body py-3 text-white">
+              <div class="text-center pt-4 pb-4">
+                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-todo-list/check1.webp"
+                  alt="Check" width="60">
+                <h2 class="my-4">Task List</h2>
+              </div>
+              <a href="{% url 'add_todo' %}" id="add-task-button" class="btn btn-light d-none">➕ Add Task</a>
+              {% if todos %}
+                <table id="todoTable" class="table  text-white mb-0 rounded-3">
+                  <thead>
+                    <tr>
+                      <th scope="col">Title</th>
+                      <th scope="col">Description</th>
+                      <th scope="col">Due Date</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for todo in todos %}
+                    <tr class="fw-normal">
+                        <th class="align-middle">{{ todo.title }}</th>
+                        <td class="align-middle">{{ todo.description }}</td>
+                        <td class="align-middle">
+                            {% if todo.due_date %}
+                                {{ todo.due_date|date:"Y-m-d H:i" }}
+                            {% else %}
+                                <span class="text-muted">No deadline</span>
+                            {% endif %}
+                        </td>
+                        <td class="align-middle">
+                            {% if todo.is_completed %}
+                                <span class="badge bg-success">Completed</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td class="align-middle">
+                          <a href="{% url 'toggle_todo_completion' todo.id %}" title="{% if todo.is_completed %}Mark as Incomplete{% else %}Mark as Complete{% endif %}">
+                            {% if todo.is_completed %}
+                            <i class="fas fa-check-circle fa-lg text-success me-3"></i>
+                            {% else %}
+                            <i class="fas fa-circle fa-lg text-opacity-25 text-secondary me-3"></i>
+                            {% endif %}
+                        </a>                      
+                          <a href="{% url 'edit_todo' todo.id %}" title="Edit">
+                              <i class="fas fa-edit fa-lg text-primary me-3"></i>
+                          </a>
+                          <a href="#" class="delete-btn" data-url="{% url 'delete_todo' todo.id %}" title="Remove">
+                            <i class="fas fa-trash-alt fa-lg text-danger"></i>
+                        </a>                      
+                      </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                </table>
+              {% else %}
+                <div class="alert alert-info text-center mt-4" role="alert">
+                  <i class="fas fa-tasks fa-2x mb-2"></i><br>
+                  No tasks found. You can add a new one using the 
+                  <strong>
+                    <a href="{% url 'add_todo' %}">➕ Add Task</a>
+                  </strong>
+                   button above!
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% block scripts %}
+{{ block.super }}
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- DataTables -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<!-- Export buttons -->
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  $(document).ready(function () {
+    if (!$.fn.DataTable.isDataTable('#todoTable')) {
+      const table = $('#todoTable').DataTable({
+        paging: true,
+        searching: true,
+        ordering: true,
+        order: [[0, 'asc']], // Order by the first column (Title) in ascending order
+        pageLength: 5,
+        lengthMenu: [5, 10, 25, 50],
+        dom: 'Bfrtip',
+        buttons: [
+          {
+            extend: 'copy',
+            exportOptions: {
+              columns: ':not(:last-child)'
+            }
+          },
+          {
+            extend: 'csv',
+            exportOptions: {
+              columns: ':not(:last-child)'
+            }
+          },
+          {
+            extend: 'excel',
+            exportOptions: {
+              columns: ':not(:last-child)'
+            }
+          },
+          {
+            extend: 'pdf',
+            exportOptions: {
+              columns: ':not(:last-child)'
+            }
+          },
+          {
+            extend: 'print',
+            exportOptions: {
+              columns: ':not(:last-child)'
+            },
+            customize: function (win) {
+              const css = 'body{ color: black !important; } table{ color: black !important; }';
+              const head = win.document.head || win.document.getElementsByTagName('head')[0];
+              const style = win.document.createElement('style');
+              style.type = 'text/css';
+              style.innerHTML = css;
+              head.appendChild(style);
+            }
+          }
+        ],
+      });
+  
+      setTimeout(function () {
+        const exportBtns = $('.dt-buttons').addClass('me-2');
+        const searchDiv = $('#todoTable_filter').addClass('mx-auto text-center');
+        const addTaskBtn = $('#add-task-button').removeClass('d-none').addClass('ms-auto');
+  
+        const toolbarRow = $('<div class="d-flex justify-content-between align-items-center flex-wrap mb-1 gap-2"></div>');
+  
+        toolbarRow.append(exportBtns);
+        toolbarRow.append(searchDiv);
+        toolbarRow.append(addTaskBtn);
+  
+        $('#todoTable_wrapper').prepend(toolbarRow);
+      }, 100);
+    }
+  });  
+</script>
+
+{% if messages %}
+  <script>
+    {% for message in messages %}
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: '{{ message }}',
+        showConfirmButton: false,
+        timer: 2000
+      });
+    {% endfor %}
+  </script>
+{% endif %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      const deleteButtons = document.querySelectorAll('.delete-btn');
+      deleteButtons.forEach(btn => {
+          btn.addEventListener('click', function (e) {
+              e.preventDefault();
+              const url = this.getAttribute('data-url');
+
+              Swal.fire({
+                  title: 'Are you sure?',
+                  text: "You won't be able to undo this!",
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#d33',
+                  cancelButtonColor: '#3085d6',
+                  confirmButtonText: 'Yes, delete it!'
+              }).then((result) => {
+                  if (result.isConfirmed) {
+                      window.location.href = url;
+                  }
+              });
+          });
+      });
+  });
+</script>
+
+{% endblock scripts %}
+{% endblock content %}
